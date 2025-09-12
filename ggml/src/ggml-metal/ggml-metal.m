@@ -2276,7 +2276,7 @@ static int ggml_metal_encode_node(struct ggml_metal_encode_context * ctx_enc, in
         }
 
         // do not write to any previous ranges
-        is_concurrent = is_concurrent && !ggml_metal_encode_mem_ranges_check_dst(ctx_enc, dst);
+        is_concurrent = is_concurrent && !ggml_metal_encode_mem_ranges_check_dst(ctx_enc, node);
 
         if (!is_concurrent) {
             ggml_metal_encode_mem_ranges_reset(ctx_enc);
@@ -5884,7 +5884,7 @@ static enum ggml_status ggml_metal_graph_compute(
     struct ggml_backend_metal_device_context * ctx_dev = backend->device->context;
 
     // number of nodes encoded by the main thread (empirically determined)
-    const int n_main = 128;
+    const int n_main = 64;
 
     // number of threads in addition to the main thread
     const int n_cb = ctx->n_cb;
@@ -6709,6 +6709,16 @@ static enum ggml_status ggml_backend_metal_graph_compute(ggml_backend_t backend,
     return ggml_metal_graph_compute(backend, cgraph);
 }
 
+static void ggml_backend_metal_graph_optimize(ggml_backend_t backend, struct ggml_cgraph * cgraph) {
+    GGML_UNUSED(backend);
+
+    //const int64_t t_start = ggml_time_us();
+
+    ggml_metal_graph_optimize(cgraph);
+
+    //printf("%s: initial graph optimize took %.3f ms\n", __func__, (ggml_time_us() - t_start) / 1000.0);
+}
+
 static void ggml_backend_metal_set_n_cb(ggml_backend_t backend, int n_cb) {
     GGML_ASSERT(ggml_backend_is_metal(backend));
 
@@ -6821,7 +6831,7 @@ static struct ggml_backend_i ggml_backend_metal_i = {
     // https://developer.apple.com/documentation/metal/mtlcommandbuffer#Synchronizing-Passes-with-Events
     /* .event_record            = */ NULL,
     /* .event_wait              = */ NULL,
-    /* .optimize_graph          = */ NULL,
+    /* .optimize_graph          = */ ggml_backend_metal_graph_optimize,
 };
 
 static ggml_guid_t ggml_backend_metal_guid(void) {
