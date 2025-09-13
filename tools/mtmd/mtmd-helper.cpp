@@ -33,6 +33,13 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb/stb_image.h"
 
+// Use ggml logging infrastructure instead of direct stdio
+#include "ggml.h"
+extern "C" void ggml_log_internal(enum ggml_log_level level, const char * format, ...);
+
+#define LOG_INF(...) ggml_log_internal(GGML_LOG_LEVEL_INFO, __VA_ARGS__)
+#define LOG_ERR(...) ggml_log_internal(GGML_LOG_LEVEL_ERROR, __VA_ARGS__)
+
 
 
 size_t mtmd_helper_get_n_tokens(const mtmd_input_chunks * chunks) {

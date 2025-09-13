@@ -102,6 +102,9 @@ MTMD_API bool mtmd_decode_use_non_causal(mtmd_context * ctx);
 // whether the current model use M-RoPE for llama_decode
 MTMD_API bool mtmd_decode_use_mrope(mtmd_context * ctx);
 
+// get current verbosity threshold
+MTMD_API enum ggml_log_level mtmd_get_verbosity(mtmd_context * ctx);
+
 // whether the current model supports vision input
 MTMD_API bool mtmd_support_vision(mtmd_context * ctx);
 

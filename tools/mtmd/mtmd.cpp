@@ -104,6 +104,7 @@ struct mtmd_context {
     int n_threads;
     std::string media_marker;
     const int n_embd_text;
+    enum ggml_log_level verbosity;
 
     // these are not token, but strings used to mark the beginning and end of image/audio embeddings
     std::string img_beg;
@@ -139,7 +140,8 @@ struct mtmd_context {
         print_timings(ctx_params.print_timings),
         n_threads    (ctx_params.n_threads),
         media_marker (ctx_params.media_marker),
-        n_embd_text  (llama_model_n_embd(text_model))
+        n_embd_text  (llama_model_n_embd(text_model)),
+        verbosity    (ctx_params.verbosity)
     {
         if (std::string(ctx_params.image_marker) != MTMD_DEFAULT_IMAGE_MARKER) {
             throw std::runtime_error("custom image_marker is not supported anymore, use media_marker instead");
@@ -815,6 +817,10 @@ bool mtmd_decode_use_non_causal(mtmd_context * ctx) {
 
 bool mtmd_decode_use_mrope(mtmd_context * ctx) {
     return ctx->use_mrope;
+}
+
+enum ggml_log_level mtmd_get_verbosity(mtmd_context * ctx) {
+    return ctx->verbosity;
 }
 
 bool mtmd_support_vision(mtmd_context * ctx) {
